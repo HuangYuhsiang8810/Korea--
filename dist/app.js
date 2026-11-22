@@ -379,12 +379,38 @@ trip.forEach((day, index) => {
   dayNav.append(button);
 });
 
+const scheduleGuide = byId("schedule-guide");
+const guideFrame = byId("schedule-guide-frame");
+
+function loadScheduleGuide() {
+  if (scheduleGuide.open && !guideFrame.hasAttribute("src")) guideFrame.src = guideFrame.dataset.src;
+}
+
+scheduleGuide.addEventListener("toggle", loadScheduleGuide);
+document.querySelector(".schedule-tools a").addEventListener("click", () => {
+  if (window.location.hash === "#schedule-guide") showView();
+});
+window.addEventListener("message", event => {
+  const origin = location.protocol === "file:" ? "null" : location.origin;
+  if (event.source !== guideFrame.contentWindow || event.origin !== origin) return;
+  const { type, height } = event.data ?? {};
+  if (type === "busan-guide-resize" && Number.isFinite(height) && height > 0) {
+    guideFrame.style.height = Math.min(height, 10000) + "px";
+  }
+});
+
 function showView() {
-  const schedule = window.location.hash === "#schedule";
+  const guide = window.location.hash === "#schedule-guide";
+  const schedule = guide || window.location.hash === "#schedule";
   homeView.hidden = schedule;
   scheduleView.hidden = !schedule;
   byId("home-nav").setAttribute("aria-current", schedule ? "false" : "page");
   byId("schedule-nav").setAttribute("aria-current", schedule ? "page" : "false");
+  if (guide) {
+    scheduleGuide.open = true;
+    loadScheduleGuide();
+    scheduleGuide.scrollIntoView();
+  }
 }
 
 function updatePackingCount() {
@@ -496,7 +522,7 @@ window.addEventListener("hashchange", () => {
     hotelInput.focus();
   } else if (window.location.hash === "#entry-guide") {
     byId("entry-guide").scrollIntoView();
-  } else {
+  } else if (window.location.hash !== "#schedule-guide") {
     window.scrollTo(0, 0);
   }
 });

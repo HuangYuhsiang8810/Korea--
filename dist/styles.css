@@ -264,7 +264,11 @@ progress::-moz-progress-bar { background: #26798b; border-radius: 8px; }
   background: white;
   color: inherit;
 }
-.schedule-meta { margin: 0 0 8px; }
+.schedule-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+.schedule-meta { margin: 0; }
+.schedule-guide { margin-top: 20px; background: white; border: 1px solid var(--line); border-radius: 16px; }
+.schedule-guide summary { padding: 13px 16px; color: var(--deep); font-weight: 750; cursor: pointer; }
+.schedule-guide iframe { display: block; width: 100%; min-height: 300px; border: 0; border-radius: 0 0 16px 16px; }
 .step-flow {
   display: flex;
   align-items: center;

@@ -15,10 +15,6 @@ const day = changes => ({
   ...Object.fromEntries(Object.keys(data.rates).map(key => [key, 0])),
   ...changes,
 });
-const config = {
-  days: 2, base: "nampo", style: "culture", transit: true, luggage: false,
-  arrival: "", departure: "", budget: 30000,
-};
 const catalog = new Map([...data.attractions, ...data.exchanges].map(place => [place.id, place]));
 const toRoute = target => toLocal(rules.railLegs(rules.airportPath(target, false))).map(leg => [leg.line, leg.from.id, leg.to.id]);
 
@@ -66,29 +62,21 @@ test("two-way currency conversion requires an explicit positive rate", () => {
   assert.equal(rules.convertCurrency(100, 0, "twd"), null);
 });
 
-test("a plan groups places, handles late arrival, recalculates after editing, and flags a missed reservation", () => {
-  const choices = ["biff", "jagalchi", "gamcheon", "songdo", "haeundae-beach", "sky-capsule"].map(id => catalog.get(id));
-  const result = rules.makePlan(choices, config);
-  assert.equal(result.itinerary.length, 2);
-  assert.equal(new Set([...result.itinerary.flat(), ...result.unassigned]).size, choices.length);
-  const shortened = rules.makePlan(choices, { ...config, arrival: "2026-11-28T20:05" });
-  assert.ok(shortened.itinerary[0].length <= 1);
-  const mixed = ["biff", "haeundae-beach", "sky-capsule"];
-  const straight = rules.summarizeDay(mixed, config, catalog, 0);
-  const reordered = rules.summarizeDay([...mixed].reverse(), config, catalog, 0);
-  assert.notEqual(straight.stops[0].place.id, reordered.stops[0].place.id);
-  assert.notEqual(straight.stops[1].arrival, reordered.stops[1].arrival);
-  const ticket = rules.summarizeDay(["sky-capsule"], { ...config, reservations: { "sky-capsule": "09:00" } }, catalog, 0);
-  assert.equal(ticket.stops[0].reservationConflict, true);
-});
-
-test("the homepage links to the guide and hides the packing input", () => {
+test("the itinerary embeds five guide features and links to the full rail image", () => {
   const home = fs.readFileSync(path.join(root, "index.html"), "utf8");
-  assert.match(home, /href="guide\.html">釜山自由行智慧攻略/);
+  assert.match(home, /href="#schedule-guide">釜山自由行智慧攻略/);
+  assert.match(home, /id="schedule-view"[\s\S]*?<details class="schedule-guide" id="schedule-guide">/);
+  assert.match(home, /<iframe[^>]+ data-src="guide\.html\?embedded=1#rail"/);
   assert.match(home, /id="packing-form" hidden/);
   assert.match(home, /資料只存於目前的瀏覽器/);
   const guide = fs.readFileSync(path.join(root, "guide.html"), "utf8");
   assert.match(guide, /href="index\.html#home"/);
   assert.match(guide, /id="guide-map"/);
+  assert.deepEqual(Array.from(guide.matchAll(/data-panel="([^"]+)"/g), entry => entry[1]),
+    ["rail", "airport", "fares", "exchange", "spots"]);
+  assert.match(guide, /href="photos\/busan-rail-network\.png" download/);
+  const png = fs.readFileSync(path.join(root, "photos/busan-rail-network.png"));
+  assert.equal(png.toString("ascii", 1, 4), "PNG");
+  assert.deepEqual([png.readUInt32BE(16), png.readUInt32BE(20)], [2400, 2750]);
   for (const file of [...scripts, "guide.js", "guide.css"]) assert.ok(guide.includes(file) && fs.existsSync(path.join(root, file)));
 });

@@ -3,7 +3,7 @@
 .guide-hero { margin-top: 24px; padding: clamp(22px, 5vw, 48px); border-radius: 23px; background: linear-gradient(115deg, #102c43, #235e68); color: white; }
 .guide-hero h1 { font-size: clamp(1.65rem, 5vw, 3.1rem); }
 .guide-hero p { margin: 8px 0 0; color: #d9eced; line-height: 1.55; }
-.guide-nav { margin: 15px 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.guide-nav { margin: 15px 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
 .guide-nav a { min-height: 44px; display: grid; place-items: center; text-align: center; padding: 6px 4px; border-radius: 9px; border: 1px solid var(--line); color: var(--ink); background: white; font-weight: 750; text-decoration: none; }
 .guide-nav a[aria-current="page"] { background: var(--deep); border-color: var(--deep); color: white; }
 .guide-panel { background: white; border: 1px solid var(--line); border-radius: 18px; padding: clamp(13px, 3vw, 26px); }
@@ -47,19 +47,17 @@
 .guide-subpanel { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--line); }
 .guide-total { display: block; background: #e9f4f1; border-radius: 9px; padding: 12px; margin-top: 14px; line-height: 1.6; }
 .guide-notice { color: #4f421d; background: #fff4d8; padding: 10px; border-radius: 8px; }
-.guide-fieldset { border: 1px solid var(--line); border-radius: 10px; padding: 9px 13px; margin: 0 0 12px; min-width: 0; }
-.guide-fieldset legend { font-weight: 750; }
-.guide-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(155px, 100%), 1fr)); gap: 2px 10px; }
-.guide-plan-results { margin-top: 13px; display: grid; gap: 10px; }
-.guide-plan-day ol { padding-left: 21px; }
-.guide-plan-day li { margin-block: 8px; padding-block: 4px; border-bottom: 1px solid var(--line); }
-.guide-plan-day li[draggable="true"] { cursor: grab; }
-.guide-plan-day li.drag-target { background: #e2eff2; }
-.guide-plan-day li .guide-action-row { margin-top: 6px; }
-.guide-plan-day li .action { font-size: .875rem; padding-inline: 7px; }
-.guide-plan-day li .secondary { margin: 0; }
 .guide-fare-day .guide-fields { margin: 6px 0 0; }
 .guide-fare-day h4 { margin: 0; }
+.guide-rail-network { margin-top: 12px; padding: 10px 12px; background: #edf5f6; border-radius: 10px; }
+.guide-rail-network summary { min-height: 28px; color: var(--deep); font-weight: 750; cursor: pointer; }
+.guide-rail-network p { margin: 8px 0; }
+.guide-rail-preview { display: block; margin-top: 10px; }
+.guide-rail-preview img { display: block; width: min(100%, 640px); height: auto; margin: auto; }
+.guide-embedded .masthead, .guide-embedded .guide-hero { display: none; }
+.guide-embedded .guide-main { width: 100%; padding: 0 8px 12px; }
+.guide-embedded .guide-nav { margin: 3px 0 8px; }
+.guide-embedded .guide-map { height: clamp(300px, 55vw, 440px); }
 @media (max-width: 620px) {
   .guide-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .guide-hero { margin-top: 14px; border-radius: 16px; }
@@ -68,5 +66,3 @@
   .guide-place-detail { grid-row: 1; }
   .guide-return { font-size: .875rem; }
 }
-.guide-reservation { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; font-size: .875rem; }
-.guide-reservation input { min-height: 44px; border: 1px solid #a6beca; border-radius: 8px; padding: 4px 7px; }

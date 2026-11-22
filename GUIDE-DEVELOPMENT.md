@@ -47,3 +47,9 @@ Phase 1 提供地圖和交通、機場、票價、換匯、景點查詢。為涵
 
 - **Phase 2** 可擴充完整東海線、營運日時表和可驗證的站到站步行距離，加入跨日移動、依實際預約自動避開衝突、整日景點開放時間資料及票券和餐飲明細。
 - **Phase 3** 待確認資料授權、費用與 API 額度後，整合即時交通及匯率，增加路線最佳化、分享、PDF 和 PWA。AI 行程說明可另加，車資與路線要繼續使用可驗證的資料。
+
+## 五日行程內嵌版
+
+- `#schedule-guide` 開啟五日行程內的攻略。保留交通地圖、機場交通、交通費用、換匯地圖、景點探索五個入口，原先的自訂行程規劃子功能已下架。攻略仍可獨立開啟 `guide.html`。
+- 交通地圖附可下載的全站 PNG。圖以站序與換乘關係呈現，含東海線日光以北至太和江的站點。互動地圖的東海線位置標記維持釜田至日光。
+- `python tools/render-busan-rail-map.py` 可在有 Pillow 和 Windows 微軟正黑體、Malgun Gothic、Segoe UI 的環境重製 PNG。站別以[釜山交通公社](https://data.humetro.busan.kr/homepage/cyberstation/map.do)、[釜山金海輕軌](https://www.bglrt.com/00162.web)與 [KORAIL](https://dev2.letskorail.com/images/subway_map.pdf) 核對。釜田與樂民至東萊的站外步行參考[韓國鐵道產業資訊中心](https://www.kric.go.kr/jsp/board/portal/sub05/res/themeEssayDetail.jsp?board_seq=2479)。
