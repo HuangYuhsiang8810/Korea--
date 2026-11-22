@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c43">
+  <title>釜山自由行智慧攻略</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+  <link rel="stylesheet" href="guide.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+  <script defer src="guide-data.js"></script>
+  <script defer src="guide-stations.js"></script>
+  <script defer src="guide-planning.js"></script>
+  <script defer src="guide.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap masthead-inner">
+      <a href="index.html#home" class="wordmark"><span class="brand-mark" aria-hidden="true">✦</span> 釜山旅行手帳</a>
+      <a href="index.html#schedule" class="guide-return">五日原訂行程</a>
+    </div>
+  </header>
+
+  <main class="wrap guide-main">
+    <section class="guide-hero" aria-labelledby="guide-heading">
+      <h1 id="guide-heading">釜山自由行智慧攻略</h1>
+      <p>查交通、找換匯、選景點，排出自己的釜山行程。</p>
+    </section>
+
+    <nav class="guide-nav" id="guide-nav" aria-label="攻略功能">
+      <a href="#rail" data-panel="rail">交通地圖</a>
+      <a href="#airport" data-panel="airport">機場交通</a>
+      <a href="#fares" data-panel="fares">交通費用</a>
+      <a href="#exchange" data-panel="exchange">換匯地圖</a>
+      <a href="#spots" data-panel="spots">景點探索</a>
+      <a href="#plan" data-panel="plan">行程規劃</a>
+    </nav>
+
+    <section class="guide-panel" id="guide-explorer" aria-labelledby="explorer-title">
+      <div class="guide-panel-heading">
+        <div><h2 id="explorer-title">交通地圖</h2><p id="explorer-intro" class="secondary"></p></div>
+        <div class="guide-action-row" id="map-toggle" aria-label="顯示方式">
+          <button class="action" type="button" data-view="map" aria-pressed="true">地圖</button>
+          <button class="action" type="button" data-view="list" aria-pressed="false">清單</button>
+        </div>
+      </div>
+      <div class="guide-fields" id="explorer-filters">
+        <label>搜尋 <input id="place-search" type="search" placeholder="輸入繁中、韓文或英文"></label>
+        <label><span id="primary-filter-label">路線</span> <select id="place-filter"></select></label>
+        <label id="spot-category-field" hidden>類型 <select id="spot-category"></select></label>
+        <label id="spot-transit-field" hidden>建議交通 <select id="spot-transit"></select></label>
+        <label id="saved-spots-field" class="guide-check" hidden><input id="saved-spots" type="checkbox"> 只看已收藏</label>
+      </div>
+      <div class="guide-action-row explorer-tools">
+        <span id="place-count" class="secondary" aria-live="polite"></span>
+        <a id="explorer-source" class="guide-source" target="_blank" rel="noopener noreferrer">官方資料</a>
+      </div>
+      <div class="guide-map" id="guide-map" aria-label="釜山位置地圖"></div>
+      <p class="guide-notice" id="map-failure" role="status" hidden></p>
+      <div class="guide-explorer-results">
+        <ul class="guide-results" id="place-list" aria-label="符合條件的位置"></ul>
+        <article id="place-detail" class="guide-place-detail" aria-live="polite"></article>
+      </div>
+      <p class="secondary" id="explorer-meta"></p>
+
+      <section class="guide-subpanel" id="exchange-calculator" hidden>
+        <h3>手動匯率換算</h3>
+        <p class="secondary">輸入店家報價。匯率單位為 1 新台幣可換多少韓元，試算不含手續費。</p>
+        <div class="guide-fields">
+          <label>1 TWD = 多少 KRW <input id="exchange-rate" type="number" min="0.0001" step="any" inputmode="decimal" placeholder="輸入匯率"></label>
+          <label>新台幣（TWD） <input id="exchange-twd" type="number" min="0" step="any" inputmode="decimal"></label>
+          <label>韓元（KRW） <input id="exchange-krw" type="number" min="0" step="any" inputmode="decimal"></label>
+        </div>
+        <p id="exchange-result" class="secondary" role="status"></p>
+      </section>
+    </section>
+
+    <section class="guide-panel" id="guide-airport" aria-labelledby="airport-heading" hidden>
+      <h2 id="airport-heading">金海機場往返市區</h2>
+      <div class="guide-fields guide-section-fields">
+        <label>市區目的地或出發站 <select id="airport-target"></select></label>
+        <label>方向 <select id="airport-direction"><option value="out">機場往市區</option><option value="in">市區往機場</option></select></label>
+      </div>
+      <div class="guide-card-grid" id="airport-routes" aria-live="polite"></div>
+      <p class="secondary" id="airport-updated"></p>
+    </section>
+
+    <section class="guide-panel" id="guide-fares" aria-labelledby="fares-heading" hidden>
+      <h2 id="fares-heading">交通費用與票券比較</h2>
+      <p class="secondary">以下為成人韓元票價。生效日未公開時，顯示最後核對日。</p>
+      <div id="fare-list" class="guide-card-grid"></div>
+      <form id="fare-form" class="guide-subpanel">
+        <h3>依每天搭乘次數試算</h3>
+        <p class="secondary">同一趟跨工具轉乘請用「已知轉乘總額」填寫。填入已含優惠的實際總額，可避免重複計費。日票比較只涵蓋地鐵 1–4 號線的獨立搭乘。</p>
+        <div class="guide-fields">
+          <label>地鐵單程付款方式 <select id="fare-payment"><option value="card">交通卡</option><option value="single">QR 單程票</option></select></label>
+          <label>試算天數 <input id="fare-days" type="number" min="1" max="14" value="3" required></label>
+        </div>
+        <div id="fare-day-fields" class="guide-card-grid"></div>
+        <output id="fare-result" class="guide-total" aria-live="polite"></output>
+      </form>
+    </section>
+
+    <section class="guide-panel" id="guide-plan" aria-labelledby="plan-heading" hidden>
+      <h2 id="plan-heading">規劃自由行</h2>
+      <p class="secondary">設定住宿和預算，再依地區安排已選景點。行程與收藏儲存在目前的瀏覽器。</p>
+      <form id="plan-form">
+        <div class="guide-fields guide-section-fields">
+          <label>旅行天數 <input name="days" type="number" min="1" max="14" value="3" required></label>
+          <label>住宿區域 <select name="base" id="plan-base"></select></label>
+          <label>旅遊風格 <select name="style" id="plan-style"></select></label>
+          <label>每日預算（KRW） <input name="budget" type="number" min="0" max="10000000" step="1" inputmode="numeric" placeholder="選填"></label>
+          <label>抵達時間（韓國時間） <input name="arrival" type="datetime-local"></label>
+          <label>離開時間（韓國時間） <input name="departure" type="datetime-local"></label>
+          <label class="guide-check"><input name="luggage" type="checkbox"> 攜帶大型行李</label>
+          <label class="guide-check"><input name="transit" type="checkbox" checked> 優先大眾運輸</label>
+        </div>
+        <fieldset class="guide-fieldset">
+          <legend>想去的景點</legend>
+          <div id="plan-options" class="guide-choices"></div>
+        </fieldset>
+        <div class="guide-action-row">
+          <button class="action primary" type="submit">產生行程</button>
+        </div>
+      </form>
+      <p id="plan-message" class="guide-notice" role="status" hidden></p>
+      <div id="plan-results" class="guide-plan-results"></div>
+    </section>
+
+    <noscript>請啟用 JavaScript 查看篩選、試算與行程規劃。</noscript>
+  </main>
+</body>
+</html>
