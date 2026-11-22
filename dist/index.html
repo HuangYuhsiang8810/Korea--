@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c43">
+  <meta name="description" content="11/28 至 12/2 的釜山五日旅行行程。">
+  <title>釜山五日旅程</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="masthead">
+    <div class="wrap masthead-inner">
+      <a href="#home" class="wordmark"><span class="brand-mark" aria-hidden="true">✦</span> 釜山旅行手帳</a>
+      <nav class="site-nav" aria-label="主要導覽">
+        <a id="home-nav" href="#home">首頁</a>
+        <a id="schedule-nav" href="#schedule">每日行程</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero" aria-labelledby="trip-title">
+      <div class="hero-copy">
+        <p class="eyebrow">BUSAN, SOUTH KOREA</p>
+        <h1 id="trip-title">釜山五日旅程</h1>
+        <p class="trip-dates"><time datetime="2026-11-28">11/28（六）</time><span aria-hidden="true">–</span><time datetime="2026-12-02">12/2（三）</time></p>
+      </div>
+      <div class="hero-photos" aria-hidden="true">
+        <div class="hero-print hero-print-back"><div id="hero-beach"></div></div>
+        <div class="hero-print hero-print-front"><div id="hero-train"></div></div>
+        <span class="hero-star">✦</span>
+      </div>
+    </section>
+
+    <section class="home-grid" id="home-view" aria-label="旅程首頁">
+      <section class="home-card countdown-card" aria-labelledby="countdown-heading">
+        <h2 id="countdown-heading">抵達釜山倒數</h2>
+        <p class="secondary">11/28（六）20:05 抵達金海機場 · 韓國時間</p>
+        <div class="countdown" id="countdown" role="timer" aria-label="抵達釜山倒數">
+          <div><strong id="days-left">00</strong><span>天</span></div>
+          <div><strong id="hours-left">00</strong><span>時</span></div>
+          <div><strong id="minutes-left">00</strong><span>分</span></div>
+          <div><strong id="seconds-left">00</strong><span>秒</span></div>
+        </div>
+        <p class="trip-state" id="trip-state" role="status" hidden></p>
+        <a class="action primary" href="#schedule">查看每日行程</a>
+      </section>
+
+      <section class="home-card entry-card" id="entry-guide" aria-labelledby="entry-heading">
+        <p class="eyebrow">行前準備</p>
+        <h2 id="entry-heading">韓國入境指南</h2>
+        <p class="secondary">這趟持台灣護照赴韓短期觀光適用。</p>
+        <div class="entry-actions">
+          <a class="action primary" href="https://www.e-arrivalcard.go.kr/portal/main/index.do?locale=EN" target="_blank" rel="noopener noreferrer">填寫官方電子入境卡</a>
+          <button class="action" id="show-ses-phrase" type="button">出示韓文問路</button>
+        </div>
+        <details class="entry-details">
+          <summary>電子入境卡怎麼填？</summary>
+          <div class="entry-detail-body">
+            <p>台灣短期觀光旅客的 K-ETA 暫免至 2026/12/31。適用暫免且沒有其他免申報資格時，請填電子入境卡。以免簽入境且持有效 K-ETA 者通常免填，可用官方導覽確認。</p>
+            <ol>
+              <li>準備護照、可收驗證碼的電子郵件、來回航班、韓國住宿地址與電話。</li>
+              <li>在官方網站選「Individual」免費申報。以韓國時間計算，抵達前 3 天可填，送出後 72 小時失效。這趟建議從 <strong>11/26 起</strong>填寫並送出，在入境查驗前完成。</li>
+              <li>核對後送出，可截圖留存申報編號備查。</li>
+            </ol>
+            <div class="entry-sources">
+              <a href="https://www.e-arrivalcard.go.kr/portal/guide/navigator.do?locale=EN" target="_blank" rel="noopener noreferrer">官方申報資格導覽</a>
+              <a href="https://e-arrivalcard.go.kr/portal/guide/eacGuide.do?locale=E" target="_blank" rel="noopener noreferrer">官方填寫與效期</a>
+              <a href="https://overseas.mofa.go.kr/tw-zh/brd/m_20387/view.do?page=1&amp;seq=61" target="_blank" rel="noopener noreferrer">台灣 K-ETA 暫免公告</a>
+            </div>
+          </div>
+        </details>
+        <details class="entry-details">
+          <summary>入境要走哪一個通道？</summary>
+          <div class="entry-detail-body">
+            <h3>未登錄 SES</h3>
+            <p>首次由金海機場入境，跟著入境標示走外國人<strong>人工證照查驗</strong>。準備護照與入境卡申報資料，若被問到行程，可出示住宿和回程訂位。通過後領行李、走海關。</p>
+            <h3>已登錄 SES</h3>
+            <p>依現場指示走 <span lang="ko">자동출입국심사</span> 或 SES 自動通關。掃描護照個資頁，入閘後依螢幕做指紋、臉部辨識，再前往行李提領。辨識失敗時，請工作人員指引人工查驗。</p>
+            <p class="secondary">返台時是出境。符合條件、年滿 17 歲的短期外籍旅客可在出境時使用自動查驗，即使未事先登錄 SES。以現場指引為準。</p>
+            <div class="entry-sources">
+              <a href="https://www.immigration.go.kr/immigration/1527/subview.do" target="_blank" rel="noopener noreferrer">韓國移民機關通關說明</a>
+            </div>
+          </div>
+        </details>
+        <details class="entry-details">
+          <summary>首次申辦 SES · 金海機場</summary>
+          <div class="entry-detail-body">
+            <p class="entry-callout"><strong>11/28（六）20:05 抵達。</strong> 金海登錄處公告為平日 09:00–18:00，12:00–13:00 午休。這次首次入境請先走人工查驗。12/2（三）原訂約 17:15 從南浦出發，想在返台前申辦，請先確認能否在 18:00 前到櫃檯，也可在旅途中洽詢釜山市區登錄處。</p>
+            <h3>資格與申辦步驟</h3>
+            <ol>
+              <li>年滿 17 歲，持有效台灣晶片護照正本。入境後由本人前往登錄處出示護照，告知要辦 SES。工作人員可能詢問訪韓目的及住宿地點，並審核資格。</li>
+              <li>依指示確認並送出電子申請與資料使用同意，採集兩手食指指紋與臉部影像。</li>
+              <li>核准後確認護照上的 SES 登錄貼紙。資格有效至該本護照到期，換發護照需重新登錄。</li>
+            </ol>
+            <h3>去哪裡辦？</h3>
+            <p><strong>金海國際機場國際線航廈 2 樓出境大廳西端，C1 報到櫃檯旁。</strong> 在 2 樓報到大廳找藍色「Gimhae Airport Immigration Office」招牌，韓文標示 <span lang="ko">출국사무과</span>。若動線有調整，請現場人員指引。</p>
+            <figure class="ses-photo">
+              <img src="photos/gimhae-ses-office.jpg" width="737" height="385" loading="lazy" alt="金海機場國際線二樓，左側是藍色出入境事務所招牌，右側為 C1、C2 報到櫃檯。">
+              <figcaption>左邊是事務所藍色招牌，右邊是 C1。<a href="https://www.hikorea.go.kr/common/pdf/center3-1.pdf" target="_blank" rel="noopener noreferrer">Hi Korea 原始照片與位置公告</a></figcaption>
+            </figure>
+            <p>金海登錄處 <a href="tel:+82519791300">+82 51-979-1300</a>。市區可洽釜山出入境機關綜合民願中心 1 樓 8 號窗口，<a href="tel:+82514613127">+82 51-461-3127</a>。去之前可致電確認當日受理。</p>
+            <div class="entry-sources">
+              <a href="https://www.hikorea.go.kr/ses/sesegt/EgtApplInfoR.pt" target="_blank" rel="noopener noreferrer">台韓 SES 官方申請說明</a>
+              <a href="https://www.hikorea.go.kr/ses/SesCenterR.pt" target="_blank" rel="noopener noreferrer">官方登錄中心清單</a>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section class="home-card olive-card" aria-labelledby="olive-heading">
+        <h2 id="olive-heading">olive young 快速導航</h2>
+        <p class="secondary">用 NAVER Map 的定位搜尋附近門市。</p>
+        <div class="olive-links">
+          <a class="action primary" id="olive-nearby" href="https://map.naver.com/p/search/%EC%98%AC%EB%A6%AC%EB%B8%8C%EC%98%81" target="_blank" rel="noopener noreferrer">搜尋附近門市</a>
+          <a class="route-secondary" id="olive-web" href="https://map.naver.com/p/search/%EC%98%AC%EB%A6%AC%EB%B8%8C%EC%98%81" target="_blank" rel="noopener noreferrer" hidden>網頁地圖</a>
+        </div>
+      </section>
+      <section class="home-card packing-card" aria-labelledby="packing-heading">
+        <div class="section-heading">
+          <h2 id="packing-heading">行前行李清單</h2>
+          <span id="packing-progress" class="secondary" aria-live="polite"></span>
+        </div>
+        <ul class="packing-list" id="packing-list"></ul>
+        <form class="inline-form" id="packing-form">
+          <input id="packing-input" aria-label="行李項目名稱" placeholder="新增要帶的物品" maxlength="80" required>
+          <button class="action" type="submit">新增</button>
+        </form>
+      </section>
+      <section class="home-card hotel-card" aria-labelledby="hotel-heading">
+        <h2 id="hotel-heading">住宿地點</h2>
+        <p class="secondary">填入飯店名稱或地址，回住宿時可直接在 NAVER Map 搜尋。</p>
+        <form class="inline-form" id="hotel-form">
+          <input id="hotel-input" aria-label="飯店名稱或地址" placeholder="飯店名稱或地址" maxlength="160">
+          <button class="action" type="submit">儲存</button>
+        </form>
+        <p class="secondary" id="hotel-status" role="status" hidden></p>
+      </section>
+    </section>
+
+    <section class="planner" id="schedule-view" aria-label="每日行程" hidden>
+      <p class="schedule-meta">所有時間為韓國當地時間</p>
+      <nav class="day-nav" id="days" role="tablist" aria-label="選擇日期"></nav>
+      <div id="day-panel" class="day-panel" role="tabpanel" tabindex="0">
+        <div class="day-heading">
+          <div>
+            <p id="day-date" class="eyebrow"></p>
+            <h2 id="day-title"></h2>
+          </div>
+          <div class="progress">
+            <span id="progress-label" aria-live="polite"></span>
+            <progress id="progress-bar" aria-label="當日行程完成進度"></progress>
+          </div>
+        </div>
+        <div class="step-flow">
+          <div class="step-current">
+            <span id="step-label" class="secondary">目前行程</span>
+            <strong id="step-title" aria-live="polite"></strong>
+          </div>
+          <div class="step-actions">
+            <button class="action" id="previous-step" type="button">上一步</button>
+            <button class="action primary" id="next-step" type="button">下一步</button>
+          </div>
+        </div>
+        <div class="day-grid">
+          <ol class="timeline" id="timeline"></ol>
+          <aside class="gallery" id="gallery" aria-label="當日景點照片"></aside>
+        </div>
+      </div>
+    </section>
+    <dialog class="ses-phrase-dialog" id="ses-phrase-dialog" aria-labelledby="ses-phrase-heading">
+      <h2 id="ses-phrase-heading">請出示給機場人員</h2>
+      <p class="ses-phrase" id="ses-phrase" lang="ko">안녕하세요. 김해공항에서 자동출입국심사(SES) 등록을 하고 싶습니다. 등록 창구가 어디에 있는지, 어떻게 가면 되는지 알려 주실 수 있을까요?</p>
+      <p class="secondary">您好，我想在金海機場申辦自動通關（SES）。請問登錄櫃檯在哪裡，該怎麼走？</p>
+      <div class="entry-actions">
+        <button class="action" id="copy-ses-phrase" type="button">複製韓文</button>
+        <a class="action primary" href="https://translate.google.com/?sl=zh-TW&amp;tl=ko&amp;text=%E6%82%A8%E5%A5%BD%EF%BC%8C%E6%88%91%E6%83%B3%E5%9C%A8%E9%87%91%E6%B5%B7%E6%A9%9F%E5%A0%B4%E7%94%B3%E8%BE%A6%E8%87%AA%E5%8B%95%E9%80%9A%E9%97%9C%EF%BC%88SES%EF%BC%89%E3%80%82%E8%AB%8B%E5%95%8F%E7%99%BB%E9%8C%84%E6%AB%83%E6%AA%AF%E5%9C%A8%E5%93%AA%E8%A3%A1%EF%BC%8C%E8%A9%B2%E6%80%8E%E9%BA%BC%E8%B5%B0%EF%BC%9F&amp;op=translate" target="_blank" rel="noopener noreferrer">開啟 Google 翻譯</a>
+        <form method="dialog"><button class="action" type="submit">關閉</button></form>
+      </div>
+      <p class="secondary" id="ses-phrase-status" role="status"></p>
+    </dialog>
+    <noscript>請啟用 JavaScript 以查看每日行程。</noscript>
+  </main>
+</body>
+</html>
