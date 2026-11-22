@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#102c43">
   <meta name="description" content="11/28 至 12/2 的釜山五日旅行行程。">
   <title>釜山五日旅程</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="app.js" defer></script>
+  <link rel="stylesheet" href="styles.css?v=schedule-guide">
+  <script src="app.js?v=schedule-guide" defer></script>
 </head>
 <body>
   <header class="masthead">
@@ -47,7 +47,7 @@
         <p class="trip-state" id="trip-state" role="status" hidden></p>
         <div class="entry-actions">
           <a class="action primary" href="#schedule">查看每日行程</a>
-          <a class="action" href="guide.html">釜山自由行智慧攻略</a>
+          <a class="action" href="#schedule-guide">釜山自由行智慧攻略</a>
         </div>
       </section>
 
@@ -144,7 +144,10 @@
     </section>
 
     <section class="planner" id="schedule-view" aria-label="每日行程" hidden>
-      <p class="schedule-meta">所有時間為韓國當地時間</p>
+      <div class="schedule-tools">
+        <p class="schedule-meta">所有時間為韓國當地時間</p>
+        <a class="action" href="#schedule-guide">智慧攻略</a>
+      </div>
       <nav class="day-nav" id="days" role="tablist" aria-label="選擇日期"></nav>
       <div id="day-panel" class="day-panel" role="tabpanel" tabindex="0">
         <div class="day-heading">
@@ -172,6 +175,10 @@
           <aside class="gallery" id="gallery" aria-label="當日景點照片"></aside>
         </div>
       </div>
+      <details class="schedule-guide" id="schedule-guide">
+        <summary>釜山自由行智慧攻略</summary>
+        <iframe id="schedule-guide-frame" title="釜山自由行智慧攻略" data-src="guide.html?embedded=1#rail"></iframe>
+      </details>
     </section>
     <dialog class="ses-phrase-dialog" id="ses-phrase-dialog" aria-labelledby="ses-phrase-heading">
       <h2 id="ses-phrase-heading">請出示給機場人員</h2>

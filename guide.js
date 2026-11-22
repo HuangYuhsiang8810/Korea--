@@ -30,7 +30,6 @@
   const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
     || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const favoritesKey = "busan-guide-favorites-v1";
-  const planKey = "busan-guide-plan-v1";
   function read(key) {
     try { return JSON.parse(localStorage.getItem(key)); }
     catch { return null; }
@@ -51,10 +50,10 @@
       source:["釜山交通公社官方路線圖", data.sources.railMap] },
     exchange: { title:"換匯地圖", intro:"查門市、營業時間和附近車站。匯率依店家當日報價。", filter:"地區",
       options:Object.entries(data.zones), places:data.exchanges, source:["Money Box 官方門市", data.sources.moneyBox] },
-    spots: { title:"景點探索", intro:"查看交通與入場資訊，並收藏想排進行程的景點。", filter:"地區",
+    spots: { title:"景點探索", intro:"查看交通與入場資訊，並收藏想去的景點。", filter:"地區",
       options:Object.entries(data.zones), places:data.attractions, source:["Visit Busan 官方旅遊資訊", data.sources.visitBusan] },
   };
-  const panels = { airport:"guide-airport", fares:"guide-fares", plan:"guide-plan" };
+  const panels = { airport:"guide-airport", fares:"guide-fares" };
   const mapNode = byId("guide-map");
   let panel = "";
   let map;
@@ -189,12 +188,11 @@
     }
     const actions = el("div", "guide-action-row");
     const saved = favorites.has(place.id);
-    const text = place.kind === "spot" ? (saved ? "取消收藏" : "收藏景點") : (saved ? "移出規劃清單" : "加入規劃清單");
+    const text = place.kind === "spot" ? (saved ? "取消收藏" : "收藏景點") : (saved ? "取消收藏" : "收藏換匯點");
     actions.append(button(text, () => {
       if (saved) favorites.delete(place.id);
       else favorites.add(place.id);
       const persisted = save(favoritesKey, [...favorites]);
-      planChoices.get(place.id).checked = !saved;
       if (panel === "spots" && byId("saved-spots").checked) updateExplorer();
       else renderPlace(place);
       if (!persisted) byId("place-detail").append(meta("瀏覽器儲存受限，本次開啟仍可使用。"));
@@ -448,189 +446,6 @@
   byId("fare-payment").addEventListener("change", renderFareTotal);
   byId("fare-form").addEventListener("submit", event => { event.preventDefault(); renderFareTotal(); });
   renderFareInputs();
-  const form = byId("plan-form");
-  const formField = key => form.elements.namedItem(key);
-  const storedPlan = read(planKey);
-  function validPlan(candidate) {
-    return Number.isSafeInteger(candidate?.config?.days) && candidate.config.days >= 1 && candidate.config.days <= 14
-      && Array.isArray(candidate.itinerary) && candidate.itinerary.length === candidate.config.days
-      && candidate.itinerary.every(day => Array.isArray(day) && day.every(id => catalog.has(id)))
-      && Array.isArray(candidate.unassigned) && candidate.unassigned.every(id => catalog.has(id));
-  }
-  let plan = validPlan(storedPlan) ? storedPlan : null;
-  let draggedFrom = null;
-  fill(byId("plan-base"), Object.keys(rules.baseStations).map(key => [key, data.zones[key]]));
-  fill(byId("plan-style"), [["", "不限風格"], ...Object.entries(data.categories)]);
-  const planChoices = new Map();
-  const storedSelection = new Set(plan ? [...plan.itinerary.flat(), ...plan.unassigned] : []);
-  for (const place of catalog.values()) {
-    const label = el("label", "guide-check");
-    const input = Object.assign(el("input"), { type:"checkbox", name:"place", value:place.id,
-      checked:storedSelection.has(place.id) || favorites.has(place.id) });
-    label.append(input, el("span", "", name(place)));
-    planChoices.set(place.id, input);
-    byId("plan-options").append(label);
-  }
-  if (plan) {
-    for (const [key, value] of Object.entries(plan.config)) {
-      const field = formField(key);
-      if (!field) continue;
-      if (field.type === "checkbox") field.checked = Boolean(value);
-      else field.value = value ?? "";
-    }
-  }
-
-  function reportPlan(message) {
-    byId("plan-message").textContent = message;
-    byId("plan-message").hidden = !message;
-  }
-
-  form.addEventListener("submit", event => {
-    event.preventDefault();
-    const fields = new FormData(form);
-    const days = formField("days").valueAsNumber;
-    const budget = formField("budget").valueAsNumber;
-    const config = {
-      days, base:fields.get("base"), style:fields.get("style"), budget:Number.isFinite(budget) ? budget : null,
-      arrival:fields.get("arrival"), departure:fields.get("departure"),
-      luggage:fields.has("luggage"), transit:fields.has("transit"),
-    };
-    if (config.arrival && config.departure) {
-      const after = Date.parse(config.departure + "+09:00") - Date.parse(config.arrival + "+09:00");
-      const distance = Date.parse(config.departure.slice(0, 10)) - Date.parse(config.arrival.slice(0, 10));
-      if (after <= 0 || distance / 86400000 + 1 !== days) {
-        reportPlan("抵達需早於離開，且旅行天數須涵蓋抵達和離開的日期。");
-        return;
-      }
-    }
-    const result = rules.makePlan(fields.getAll("place").map(id => catalog.get(id)).filter(Boolean), config);
-    if (!result) {
-      reportPlan("請輸入有效天數並至少選一個地點。");
-      return;
-    }
-    plan = { config, ...result };
-    const saved = save(planKey, plan);
-    reportPlan(plan.unassigned.length ? "部分景點尚未排入。可增加天數或少選景點再產生。"
-      : saved ? "" : "瀏覽器儲存受限，這份行程只保留在目前頁面。");
-    renderPlan();
-  });
-
-  function formatTime(minutes) {
-    return (minutes >= 1440 ? "隔日 " : "") + String(Math.floor(minutes / 60) % 24).padStart(2, "0") + ":" + String(minutes % 60).padStart(2, "0");
-  }
-
-  function moveStop(day, from, to, direction) {
-    const stops = plan.itinerary[day];
-    if (from === to || !stops[from] || !stops[to]) return;
-    const [id] = stops.splice(from, 1);
-    stops.splice(to, 0, id);
-    const saved = save(planKey, plan);
-    renderPlan();
-    reportPlan(saved ? "已調整順序並重新試算。" : "已重新試算，瀏覽器儲存受限。");
-    const row = byId("plan-results").querySelector('[data-stop="' + day + "-" + to + '"]');
-    (row?.querySelector("." + direction + ":enabled") ?? row?.querySelector("button:enabled"))?.focus();
-  }
-
-  function routeSummary(route) {
-    const time = route.minutes === null ? "時間待查，排程暫留 30 分鐘" : "系統估算 " + route.minutes + " 分鐘";
-    const via = route.legs.length > 1 ? " · 轉乘 " + route.legs.slice(0, -1).map(leg => name(leg.to)).join("、") : "";
-    return route.mode + " · " + time + " · " + (route.fare ? range(route.fare) : "票價待查") + via;
-  }
-
-  function renderStop(stop, day, index, count) {
-    const row = el("li");
-    row.dataset.stop = day + "-" + index;
-    row.draggable = true;
-    row.addEventListener("dragstart", event => {
-      draggedFrom = { day, index };
-      event.dataTransfer.setData("text/plain", stop.place.id);
-      event.dataTransfer.effectAllowed = "move";
-    });
-    row.addEventListener("dragover", event => {
-      if (draggedFrom?.day !== day) return;
-      event.preventDefault();
-      row.classList.add("drag-target");
-    });
-    row.addEventListener("dragleave", () => row.classList.remove("drag-target"));
-    row.addEventListener("dragend", () => { draggedFrom = null; });
-    row.addEventListener("drop", event => {
-      event.preventDefault();
-      row.classList.remove("drag-target");
-      if (draggedFrom?.day === day) moveStop(day, draggedFrom.index, index, "move-up");
-      draggedFrom = null;
-    });
-    row.append(el("strong", "", formatTime(stop.arrival) + " · " + name(stop.place)),
-      meta("建議停留 " + stop.place.duration + " 分鐘" + (stop.outsideHours ? " · 超出當日可用時段，請調整" : "")),
-      meta(routeSummary(stop.route)));
-    if (stop.closed) row.append(meta("這天為官網公告的例行休市日，請調整到其他日。"));
-    if (stop.place.reservation) {
-      const field = el("label", "guide-reservation", "已訂時段 ");
-      const input = Object.assign(el("input"), { type:"time", value:plan.config.reservations?.[stop.place.id] ?? "" });
-      input.addEventListener("change", () => {
-        plan.config.reservations ??= {};
-        plan.config.reservations[stop.place.id] = input.value;
-        save(planKey, plan);
-        renderPlan();
-      });
-      field.append(input);
-      row.append(field);
-      if (stop.reservationConflict) row.append(meta("依目前順序可能趕不上已訂時段，請提前安排。"));
-      else if (!input.value) row.append(meta("若已有訂票時段，可填入以檢查時間。"));
-    }
-    const controls = el("div", "guide-action-row");
-    const up = button("往上移", () => moveStop(day, index, index - 1, "move-up"), "action move-up");
-    const down = button("往下移", () => moveStop(day, index, index + 1, "move-down"), "action move-down");
-    up.disabled = index === 0;
-    down.disabled = index + 1 === count;
-    const mode = stop.route.mode === "步行" ? "walking" : plan.config.transit ? "transit" : "driving";
-    controls.append(up, down, directions(stop.from, stop.place, mode));
-    row.append(controls);
-    return row;
-  }
-
-  function renderPlan() {
-    const results = byId("plan-results");
-    results.replaceChildren();
-    if (!plan) return;
-    const { config } = plan;
-    const totals = [0, 0];
-    let pending = 0;
-    plan.itinerary.forEach((ids, day) => {
-      const card = el("article", "guide-info-card guide-plan-day");
-      const outline = rules.summarizeDay(ids, config, catalog, day);
-      card.append(el("h3", "", "第 " + (day + 1) + " 天"));
-      if (day === 0 && config.arrival) {
-        const airportLink = el("a", "guide-link", "查看抵達後機場交通");
-        airportLink.href = "#airport";
-        card.append(airportLink);
-      }
-      if (day === config.days - 1 && config.departure) card.append(meta("起飛前預留 3 小時，前往機場的移動時間需另排。"));
-      if (outline.stops.length) {
-        const list = el("ol");
-        list.append(...outline.stops.map((stop, index) => renderStop(stop, day, index, outline.stops.length)));
-        card.append(list, meta("返回住宿區 " + name(outline.home) + " · " + routeSummary(outline.back)),
-          meta("已估交通 " + outline.knownTime + " 分鐘／" + range(outline.range)
-            + " · " + outline.uncertainTime + " 段時間、" + outline.missing + " 段車資待查"));
-        if (outline.lateReturn) card.append(meta("可能超出當日可用時段，請縮減景點或調序。"));
-      } else {
-        card.append(meta("這天保留彈性。"));
-      }
-      if (Number.isFinite(config.budget)) {
-        const remaining = config.budget - outline.range[1];
-        card.append(meta("每日預算 " + won(config.budget) + " · "
-          + (remaining < 0 ? "交通上限超出 " + won(-remaining) : "扣除已估交通上限後剩 " + won(remaining))
-          + "；餐飲、門票和未估交通另計"));
-      }
-      totals[0] += outline.range[0];
-      totals[1] += outline.range[1];
-      pending += outline.missing;
-      results.append(card);
-    });
-    results.prepend(el("p", "guide-total", "全程已估市內交通 " + range(totals)
-      + " · " + pending + " 段車資待查。時間由站數與距離估算，實際班次與路程請用地圖確認。"));
-    if (plan.unassigned.length) results.append(meta("尚未排入 · " + plan.unassigned.map(id => name(catalog.get(id))).join("、")));
-  }
-
   function showPanel() {
     const requested = window.location.hash.slice(1);
     const next = Object.hasOwn(explorers, requested) || Object.hasOwn(panels, requested) ? requested : "rail";
@@ -638,11 +453,27 @@
     panel = next;
     const isExplorer = Object.hasOwn(explorers, next);
     byId("guide-explorer").hidden = !isExplorer;
+    byId("guide-rail-network").hidden = next !== "rail";
     for (const [key, id] of Object.entries(panels)) byId(id).hidden = key !== next;
     for (const link of byId("guide-nav").querySelectorAll("a")) link.setAttribute("aria-current", link.dataset.panel === next ? "page" : "false");
     if (isExplorer) prepareExplorer();
     if (next === "airport") renderAirport();
-    if (next === "plan") renderPlan();
+  }
+
+  if (window.parent !== window && new URLSearchParams(window.location.search).get("embedded") === "1") {
+    document.body.classList.add("guide-embedded");
+    const main = document.querySelector(".guide-main");
+    const parentOrigin = location.protocol === "file:" ? "*" : location.origin;
+    new ResizeObserver(() => {
+      window.parent.postMessage({ type:"busan-guide-resize", height:Math.ceil(main.offsetHeight) }, parentOrigin);
+    }).observe(main);
+    byId("guide-nav").addEventListener("click", event => {
+      const link = event.target.closest("[data-panel]");
+      if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      event.preventDefault();
+      history.replaceState(null, "", link.hash);
+      showPanel();
+    });
   }
 
   window.addEventListener("hashchange", showPanel);
