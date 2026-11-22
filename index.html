@@ -45,7 +45,10 @@
           <div><strong id="seconds-left">00</strong><span>秒</span></div>
         </div>
         <p class="trip-state" id="trip-state" role="status" hidden></p>
-        <a class="action primary" href="#schedule">查看每日行程</a>
+        <div class="entry-actions">
+          <a class="action primary" href="#schedule">查看每日行程</a>
+          <a class="action" href="guide.html">釜山自由行智慧攻略</a>
+        </div>
       </section>
 
       <section class="home-card entry-card" id="entry-guide" aria-labelledby="entry-heading">
@@ -124,14 +127,14 @@
           <span id="packing-progress" class="secondary" aria-live="polite"></span>
         </div>
         <ul class="packing-list" id="packing-list"></ul>
-        <form class="inline-form" id="packing-form">
+        <form class="inline-form" id="packing-form" hidden>
           <input id="packing-input" aria-label="行李項目名稱" placeholder="新增要帶的物品" maxlength="80" required>
           <button class="action" type="submit">新增</button>
         </form>
       </section>
       <section class="home-card hotel-card" aria-labelledby="hotel-heading">
         <h2 id="hotel-heading">住宿地點</h2>
-        <p class="secondary">填入飯店名稱或地址，回住宿時可直接在 NAVER Map 搜尋。</p>
+        <p class="secondary">輸入飯店名稱或地址並按「儲存」。「前往住宿」和「回住宿」的行程會帶入這個地點，方便在 NAVER Map 搜尋。資料只存於目前的瀏覽器。</p>
         <form class="inline-form" id="hotel-form">
           <input id="hotel-input" aria-label="飯店名稱或地址" placeholder="飯店名稱或地址" maxlength="160">
           <button class="action" type="submit">儲存</button>
