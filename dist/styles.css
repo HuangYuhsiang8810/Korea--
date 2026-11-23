@@ -74,7 +74,7 @@ progress::-moz-progress-bar { background: #26798b; border-radius: 8px; }
 .day-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(180px, 240px); align-items: start; gap: 24px; padding-top: 15px; }
 .timeline { list-style: none; padding: 0; margin: 0; }
 .event { padding-block: 5px; }
-.event time { color: #385368; font-size: .875rem; line-height: 1.7; font-variant-numeric: tabular-nums; }
+.event-time { color: #385368; font-size: .875rem; line-height: 1.7; font-variant-numeric: tabular-nums; }
 .event-title { display: block; font-weight: 650; line-height: 1.5; overflow-wrap: anywhere; }
 .event-note { margin: 3px 0 0; color: var(--muted); font-size: .875rem; line-height: 1.45; }
 .tag { display: inline-block; margin: 4px 0 0; padding: 2px 8px; border-radius: 7px; background: #e7f1f5; color: #255770; font-size: .8125rem; font-weight: 650; line-height: 1.4; }
@@ -114,7 +114,7 @@ progress::-moz-progress-bar { background: #26798b; border-radius: 8px; }
   .day-heading .eyebrow { margin-bottom: 4px; }
   .progress { width: 100%; grid-template-columns: max-content 1fr; align-items: center; gap: 10px; }
   .day-grid { padding-top: 4px; }
-  .event time { font-size: .8125rem; }
+  .event-time { font-size: .8125rem; }
 }
 @media print {
   .masthead, .hero-photos, .day-nav { display: none; }
@@ -301,18 +301,16 @@ progress::-moz-progress-bar { background: #26798b; border-radius: 8px; }
 .event-status { color: var(--muted); display: inline-block; font-size: .8125rem; margin: 4px 8px 0 0; }
 .tag + .event-status { margin-left: 8px; }
 .event-completed .event-title { color: var(--muted); }
+.event-maps { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 8px 8px; }
 .route {
   display: flex;
   flex-wrap: wrap;
   gap: 0 8px;
   align-items: center;
-  justify-content: space-between;
   padding-inline: 10px;
-  margin-bottom: 3px;
   border-radius: 7px;
   background: #f1f7f4;
 }
-.route-label { color: #345a50; font-size: .875rem; padding-block: 4px; }
 .route-links { display: flex; gap: 10px; flex-wrap: wrap; }
 .route a { display: inline-flex; align-items: center; min-height: 44px; font-size: .875rem; text-underline-offset: 3px; }
 .route-guide { color: #13614e; font-weight: 750; }
