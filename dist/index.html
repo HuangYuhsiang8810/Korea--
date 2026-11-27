@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#102c43">
   <meta name="description" content="11/28 至 12/2 的釜山五日旅行行程。">
   <title>釜山五日旅程</title>
-  <link rel="stylesheet" href="styles.css?v=final-itinerary">
-  <script src="app.js?v=coastal-itinerary" defer></script>
+  <link rel="stylesheet" href="styles.css?v=offline-1">
+  <script src="app.js?v=offline-1" defer></script>
 </head>
 <body>
   <header class="masthead">
@@ -49,6 +49,7 @@
         <div class="entry-actions">
           <a class="action primary" href="#schedule">查看每日行程</a>
           <a class="action" href="#schedule-guide">釜山自由行智慧攻略</a>
+          <a class="action" href="#offline-kit">離線準備</a>
         </div>
       </section>
 
@@ -151,6 +152,18 @@
         <p class="schedule-meta">行程使用韓國時間，航班各依當地時間。點地點開啟 NAVER Map。</p>
         <a class="action" href="#schedule-guide">智慧攻略</a>
       </div>
+      <details class="offline-kit" id="offline-kit">
+        <summary>離線準備</summary>
+        <p class="secondary">有網路時在這台手機預存行程與地鐵圖。也可下載文字備份到手機「檔案」。</p>
+        <div class="entry-actions">
+          <button class="action primary" id="save-offline" type="button">預存離線行程</button>
+          <button class="action" id="download-itinerary" type="button">下載五日行程 TXT</button>
+          <a class="action" href="photos/busan-rail-network.png" download>下載地鐵圖</a>
+        </div>
+        <p class="secondary" id="offline-status" role="status"></p>
+        <p class="secondary">斷網時可在每日行程展開韓文地點給司機看。NAVER Map 可事先下載區域地圖節省流量，搜尋、新路線和即時交通仍須以 App 實際連線為準。</p>
+        <a href="https://help.naver.com/service/5637/contents/8271" target="_blank" rel="noopener noreferrer">NAVER Map 區域地圖下載說明</a>
+      </details>
       <nav class="day-nav" id="days" role="tablist" aria-label="選擇日期"></nav>
       <div id="day-panel" class="day-panel" role="tabpanel" tabindex="0">
         <div class="day-heading">
@@ -163,6 +176,10 @@
             <progress id="progress-bar" aria-label="當日行程完成進度"></progress>
           </div>
         </div>
+        <details class="offline-places">
+          <summary>當日離線地點（韓文）</summary>
+          <ul id="offline-places"></ul>
+        </details>
         <div class="step-flow">
           <div class="step-current">
             <span id="step-label" class="secondary">目前行程</span>

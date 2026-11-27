@@ -190,10 +190,15 @@ function stepState(day) {
   };
 }
 
-function makeNavigation(destination, mode) {
+function placeDetails(destination) {
   const [name, placeQuery, latitude, longitude] = destination;
   const query = destination === hotel ? hotelQuery : placeQuery;
   const label = destination === hotel && query !== defaultHotelQuery ? "自訂住宿" : name;
+  return { label, query, latitude, longitude };
+}
+
+function makeNavigation(destination, mode) {
+  const { label, query, latitude, longitude } = placeDetails(destination);
   const row = element("div", "route");
 
   const webUrl = "https://map.naver.com/p/search/" + encodeURIComponent(query);
@@ -271,6 +276,50 @@ function showSteps() {
   nextStep.textContent = active ? "下一步" : dayIndex === trip.length - 1 ? "已完成" : "下一天";
 }
 
+function showOfflinePlaces(day) {
+  const places = new Map();
+  for (const [, , , , destinations = []] of day.events) {
+    for (const destination of destinations) {
+      const { label, query, latitude, longitude } = placeDetails(destination);
+      if (places.has(label)) continue;
+      const item = element("li");
+      const korean = element("span", "", query);
+      korean.lang = "ko";
+      item.append(element("strong", "", label), korean);
+      if (Number.isFinite(latitude) && Number.isFinite(longitude)) {
+        item.append(element("span", "secondary", latitude.toFixed(5) + ", " + longitude.toFixed(5)));
+      }
+      places.set(label, item);
+    }
+  }
+  byId("offline-places").replaceChildren(...places.values());
+}
+
+byId("download-itinerary").addEventListener("click", () => {
+  const lines = ["釜山五日行程｜2026/11/28–12/2",
+    "行程使用韓國時間，航班各依當地時間。下列韓文可直接出示。"];
+  for (const [index, day] of trip.entries()) {
+    lines.push("", "Day " + (index + 1) + "｜" + day.date + " " + day.title);
+    for (const [time, title, tag, note, destinations = []] of day.events) {
+      lines.push(time + " " + title + (tag ? "（" + tag + "）" : ""));
+      if (note) lines.push(note);
+      for (const destination of destinations) {
+        const { label, query, latitude, longitude } = placeDetails(destination);
+        const coordinates = Number.isFinite(latitude) && Number.isFinite(longitude) ? "（" + latitude + ", " + longitude + "）" : "";
+        lines.push("  " + label + "｜" + query + coordinates);
+      }
+    }
+  }
+  const url = URL.createObjectURL(new Blob(["\ufeff", lines.join("\r\n")], { type: "text/plain;charset=utf-8" }));
+  const link = element("a");
+  link.href = url;
+  link.download = "busan-itinerary.txt";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+});
+
 function showDay(index) {
   dayIndex = index;
   const day = trip[index];
@@ -288,6 +337,7 @@ function showDay(index) {
     return figure;
   }));
   showSteps();
+  showOfflinePlaces(day);
 }
 
 function revealActiveStep() {
@@ -353,6 +403,43 @@ trip.forEach((day, index) => {
 
 const scheduleGuide = byId("schedule-guide");
 const guideFrame = byId("schedule-guide-frame");
+const offlineKit = byId("offline-kit");
+const saveOffline = byId("save-offline");
+const offlineStatus = byId("offline-status");
+
+function markOfflineReady() {
+  saveOffline.textContent = "已預存離線行程";
+  saveOffline.disabled = true;
+  offlineStatus.textContent = "可關閉 Wi-Fi 與行動數據後，重新整理本頁驗證。";
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.ready.then(markOfflineReady);
+  saveOffline.addEventListener("click", async () => {
+    saveOffline.disabled = true;
+    offlineStatus.textContent = "正在下載行程、攻略與地鐵圖…";
+    try {
+      const registration = await navigator.serviceWorker.register("sw.js");
+      const worker = registration.installing ?? registration.waiting ?? registration.active;
+      if (!worker) throw new Error("Service worker unavailable");
+      const track = () => {
+        if (worker.state === "activated") markOfflineReady();
+        if (worker.state === "redundant" && !registration.active) {
+          offlineStatus.textContent = "預存未完成，請在網路穩定時重試，或下載文字備份。";
+          saveOffline.disabled = false;
+        }
+      };
+      worker.addEventListener("statechange", track);
+      track();
+    } catch {
+      offlineStatus.textContent = "無法預存，請在網路穩定時重試，或下載文字備份。";
+      saveOffline.disabled = false;
+    }
+  });
+} else {
+  saveOffline.hidden = true;
+  offlineStatus.textContent = "可用文字備份和地鐵圖在此瀏覽器離線查看。";
+}
 
 function loadScheduleGuide() {
   if (scheduleGuide.open && !guideFrame.hasAttribute("src")) guideFrame.src = guideFrame.dataset.src;
@@ -373,7 +460,8 @@ window.addEventListener("message", event => {
 
 function showView() {
   const guide = window.location.hash === "#schedule-guide";
-  const schedule = guide || window.location.hash === "#schedule";
+  const offline = window.location.hash === "#offline-kit";
+  const schedule = guide || offline || window.location.hash === "#schedule";
   homeView.hidden = schedule;
   scheduleView.hidden = !schedule;
   byId("home-nav").setAttribute("aria-current", schedule ? "false" : "page");
@@ -382,6 +470,10 @@ function showView() {
     scheduleGuide.open = true;
     loadScheduleGuide();
     scheduleGuide.scrollIntoView();
+  }
+  if (offline) {
+    offlineKit.open = true;
+    offlineKit.scrollIntoView();
   }
 }
 
@@ -428,6 +520,7 @@ byId("hotel-form").addEventListener("submit", event => {
   status.textContent = hotelQuery === defaultHotelQuery ? "使用預設住宿 Stay Gaon" : "已儲存自訂導航地點";
   status.hidden = false;
   showSteps();
+  showOfflinePlaces(trip[dayIndex]);
 });
 
 const arrival = Date.parse("2026-11-28T20:05:00+09:00");
@@ -494,7 +587,7 @@ window.addEventListener("hashchange", () => {
     hotelInput.focus();
   } else if (window.location.hash === "#entry-guide") {
     byId("entry-guide").scrollIntoView();
-  } else if (window.location.hash !== "#schedule-guide") {
+  } else if (window.location.hash !== "#schedule-guide" && window.location.hash !== "#offline-kit") {
     window.scrollTo(0, 0);
   }
 });

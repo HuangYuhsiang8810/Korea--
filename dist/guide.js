@@ -288,17 +288,42 @@
   fill(byId("spot-transit"), [["", "不限交通"], ...Object.entries(data.transitLabels)]);
 
   let exchangeDirection = "twd";
+  const exchangeRate = byId("exchange-rate");
+  const exchangeSaved = byId("exchange-saved");
+  const exchangeKey = "busan-guide-exchange-rate-v1";
+  const exchangeDate = new Intl.DateTimeFormat("zh-TW", { dateStyle:"short", timeStyle:"short", timeZone:"Asia/Taipei" });
+  const lastRate = read(exchangeKey);
+  if (Number.isFinite(lastRate?.rate) && lastRate.rate > 0 && Number.isFinite(Date.parse(lastRate.savedAt))) {
+    exchangeRate.value = lastRate.rate;
+    exchangeSaved.textContent = "上次手動輸入於 " + exchangeDate.format(new Date(lastRate.savedAt)) + "（台灣時間）。";
+  }
+
   function updateExchange() {
     const amount = byId("exchange-" + exchangeDirection);
     const other = byId("exchange-" + (exchangeDirection === "twd" ? "krw" : "twd"));
-    const result = rules.convertCurrency(amount.valueAsNumber, byId("exchange-rate").valueAsNumber, exchangeDirection);
+    const result = rules.convertCurrency(amount.valueAsNumber, exchangeRate.valueAsNumber, exchangeDirection);
     other.value = result === null ? "" : result.toFixed(exchangeDirection === "twd" ? 0 : 2);
     byId("exchange-result").textContent = result === null ? "輸入正數匯率和任一金額。" : "依你輸入的匯率換算。";
   }
   for (const currency of ["twd", "krw"]) {
     byId("exchange-" + currency).addEventListener("input", () => { exchangeDirection = currency; updateExchange(); });
   }
-  byId("exchange-rate").addEventListener("input", updateExchange);
+  exchangeRate.addEventListener("input", () => {
+    exchangeSaved.textContent = "";
+    updateExchange();
+  });
+  exchangeRate.addEventListener("change", () => {
+    const rate = exchangeRate.valueAsNumber;
+    const savedAt = new Date();
+    if (Number.isFinite(rate) && rate > 0) {
+      exchangeSaved.textContent = save(exchangeKey, { rate, savedAt:savedAt.toISOString() })
+        ? "已儲存手動匯率 · " + exchangeDate.format(savedAt) + "（台灣時間）"
+        : "此瀏覽器目前無法儲存匯率。";
+    } else {
+      save(exchangeKey, null);
+      exchangeSaved.textContent = "";
+    }
+  });
   function describeLegs(legs) {
     return legs.filter(leg => leg.stops > 0)
       .map(leg => name(leg.from) + " ⟶ " + name(leg.to) + "（" + data.lines[leg.line].label + "）").join(" · ");
