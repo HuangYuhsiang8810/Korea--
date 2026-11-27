@@ -12,7 +12,7 @@
   <script defer src="guide-data.js"></script>
   <script defer src="guide-stations.js"></script>
   <script defer src="guide-planning.js?v=schedule-guide"></script>
-  <script defer src="guide.js?v=schedule-guide"></script>
+  <script defer src="guide.js?v=offline-1"></script>
 </head>
 <body>
   <header class="masthead">
@@ -77,12 +77,14 @@
 
       <section class="guide-subpanel" id="exchange-calculator" hidden>
         <h3>手動匯率換算</h3>
-        <p class="secondary">輸入店家報價。匯率單位為 1 新台幣可換多少韓元，試算不含手續費。</p>
+        <p class="secondary">有網路時可查銀行參考牌告，換匯以店家實際報價為準。輸入 1 新台幣可換多少韓元，試算不含手續費。</p>
+        <a class="guide-source" href="https://rate.bot.com.tw/xrt/quote/day/KRW?Lang=zh-TW" target="_blank" rel="noopener noreferrer">查看臺灣銀行韓元牌告</a>
         <div class="guide-fields">
           <label>1 TWD = 多少 KRW <input id="exchange-rate" type="number" min="0.0001" step="any" inputmode="decimal" placeholder="輸入匯率"></label>
           <label>新台幣（TWD） <input id="exchange-twd" type="number" min="0" step="any" inputmode="decimal"></label>
           <label>韓元（KRW） <input id="exchange-krw" type="number" min="0" step="any" inputmode="decimal"></label>
         </div>
+        <p id="exchange-saved" class="secondary" role="status"></p>
         <p id="exchange-result" class="secondary" role="status"></p>
       </section>
     </section>
